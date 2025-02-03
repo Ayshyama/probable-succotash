@@ -61,3 +61,5 @@ This approach makes it easy to extend the database while maintaining backward co
 
     - Ensuring Data Completeness: The form validation prevents missing fields like billing address before submission.
     - Product Price Calculation at Order Level: Instead of relying on user input, product prices are fetched from the database, avoiding manipulation risks.
+
+![Screenshot](./img.png)
