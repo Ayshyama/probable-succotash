@@ -1,5 +1,5 @@
-# probable-succotash
-_Chargetic's order form_
+# demo task repository
+Chargetic's order form
 
 
 **Running the Project**
