@@ -1,0 +1,297 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% trans "Order Form" %}</title>
+
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- Google Font for Signature -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap"
+          rel="stylesheet">
+
+    <!-- Static CSS -->
+    <link rel="stylesheet" href="{% static 'css/order_form.css' %}">
+</head>
+<body>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">{% trans "Bestellformular" %}</h2>
+
+    <!-- Display form-level (non-field) errors in red if any -->
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Billing Address -->
+        <table class="order-table bottom__none">
+            <tr>
+                <th colspan="2">{% trans "Rechnungsadressinformationen" %}</th>
+            </tr>
+            <tr>
+                <td>{% trans "Vollständiger Name" %}</td>
+                <td>
+                    {{ form.billing_name }}
+                    {% for error in form.billing_name.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <td>{% trans "Straße / Hausnummer" %}</td>
+                <td>
+                    {{ form.billing_address }}
+                    {% for error in form.billing_address.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <td>{% trans "PLZ / Ort" %}</td>
+                <td>
+                    {{ form.billing_zip_city }}
+                    {% for error in form.billing_zip_city.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <td>{% trans "E-Mail (Optional)" %}</td>
+                <td>
+                    {{ form.billing_email }}
+                    {% for error in form.billing_email.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <td class="bottom__none">{% trans "Telefon (Optional)" %}</td>
+                <td class="bottom__none">
+                    {{ form.billing_phone }}
+                    {% for error in form.billing_phone.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+        </table>
+
+        <!-- Shipping Address -->
+        <table class="order-table">
+            <tr>
+                <th colspan="2" class="shipping__table">
+                    {% trans "Versandadressinformationen" %}
+                    <div class="d-flex align-items-center mt-2">
+                        {{ form.same_as_billing }}
+                        <label for="id_same_as_billing" class="ms-1 text-secondary hint__text">
+                            {% trans "Lieferadresse ist gleich Rechnungsadresse" %}
+                        </label>
+                    </div>
+                    {% for error in form.same_as_billing.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </th>
+            </tr>
+            <tr>
+                <td>{% trans "Vollständiger Name" %}</td>
+                <td>
+                    {{ form.shipping_name }}
+                    {% for error in form.shipping_name.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <td>{% trans "Straße / Hausnummer" %}</td>
+                <td>
+                    {{ form.shipping_address }}
+                    {% for error in form.shipping_address.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <td>{% trans "PLZ / Ort" %}</td>
+                <td>
+                    {{ form.shipping_zip_city }}
+                    {% for error in form.shipping_zip_city.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+        </table>
+
+        <br>
+
+        <!-- General Order Information -->
+        <table class="order-table">
+            <tr>
+                <th colspan="2">{% trans "Allgemeine Bestellinformationen" %}*</th>
+            </tr>
+            <tr>
+                <td>{% trans "Bestelldatum" %}</td>
+                <td>
+                    {{ form.order_date_display }}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="text-secondary hint__text">
+                    {% trans "Die Bestellung ist nach Bestätigung gültig." %}
+                </td>
+            </tr>
+            <tr>
+                <td>{% trans "Parkplatznummer" %}</td>
+                <td>
+                    {{ form.parking_spot }}
+                    {% for error in form.parking_spot.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="text-secondary hint__text">
+                    {% trans "Bitte geben Sie den Parkplatz an, auf dem die Station installiert wird." %}
+                </td>
+            </tr>
+        </table>
+
+        <br>
+
+        <!-- Signature -->
+        <table class="order-table">
+            <tr>
+                <th>{% trans "Unterschrift" %}</th>
+                <th>{% trans "Datum und Ort" %}</th>
+            </tr>
+            <tr>
+                <td class="w-50">
+                    <!-- Name must be 'signature' so Django picks it up -->
+                    <input type="text" name="signature" id="signature-input" class="form-control"
+                           placeholder="{% trans 'Tragen Sie Ihren Namen ein' %}">
+                    <!-- styled signature preview -->
+                    <div class="styled-signature d-flex justify-content-center"
+                         id="styled-signature">
+                        {% trans "Ihre Unterschrift" %}
+                    </div>
+                    {% for error in form.signature.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </td>
+                <td>
+                    {{ form.date_location_display }}
+                </td>
+            </tr>
+        </table>
+
+        <br>
+
+        <!-- Product Selection -->
+        <h5>{% trans "Produkte auswählen" %}</h5>
+        <div class="d-flex gap-2">
+            <select id="product-list" class="form-select">
+                <option value="">{% trans "Wählen Sie ein Produkt" %}</option>
+            </select>
+
+            <!-- If you want to allow user to pick a quantity: -->
+            <input type="number" class="form-control" id="quantity-input" min="1" value="1" style="width:80px;">
+
+            <button type="button" id="add-product" class="btn btn-success">
+                {% trans "Hinzufügen" %}
+            </button>
+        </div>
+
+        <!-- Show user's chosen products -->
+        <ul id="selected-products" class="list-group mt-3"></ul>
+
+        <!-- Hidden field to store chosen products as JSON for submission -->
+        <input type="hidden" name="selected_products" id="selected-products-data">
+
+        <br>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submit-order" class="btn btn-primary mt-3 mb-4 w-100">
+            {% trans "Bestellung absenden" %}
+        </button>
+    </form>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Prevent 'Enter' key from auto-submitting
+        document.querySelector("form").addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+            }
+        });
+
+        // Signature input => styled signature text
+        const signatureInput = document.getElementById("signature-input");
+        const styledSignature = document.getElementById("styled-signature");
+        signatureInput.addEventListener("input", function () {
+            const name = this.value.trim();
+            styledSignature.textContent = name ? name : "{% trans 'Your Signature' %}";
+        });
+
+        // Product Selection with vanilla fetch
+        fetch("/orders/api/products/")
+            .then(response => response.json())
+            .then(data => {
+                const products = data.products;
+                const productList = document.getElementById("product-list");
+                products.forEach(product => {
+                    const option = document.createElement("option");
+                    option.value = product.id;
+                    option.textContent = `${product.name} - €${product.price}`;
+                    productList.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Error loading products:", error));
+
+        // Keep track of chosen products in an array
+        let chosenProducts = [];
+
+        const addProductBtn = document.getElementById("add-product");
+        const selectedProductsList = document.getElementById("selected-products");
+        const hiddenProductsData = document.getElementById("selected-products-data");
+        const quantityInput = document.getElementById("quantity-input");
+
+        // Handle adding products to the list
+        addProductBtn.addEventListener("click", function () {
+            const productSelect = document.getElementById("product-list");
+            const selectedValue = productSelect.value; // product.id
+            const selectedText = productSelect.options[productSelect.selectedIndex].text;
+            const quantity = parseInt(quantityInput.value) || 1;
+
+            if (selectedValue) {
+                // Add to our chosenProducts array
+                chosenProducts.push({
+                    id: selectedValue,
+                    text: selectedText,
+                    quantity: quantity
+                });
+
+                // Show in the UI list
+                const li = document.createElement("li");
+                li.classList.add("list-group-item");
+                li.textContent = `${selectedText} (x${quantity})`;
+                selectedProductsList.appendChild(li);
+
+                // Update hidden field with JSON
+                hiddenProductsData.value = JSON.stringify(chosenProducts);
+            }
+        });
+    });
+</script>
+</body>
+</html>
